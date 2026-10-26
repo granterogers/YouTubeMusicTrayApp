@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Tray, Menu, globalShortcut, nativeImage, webContents } = require('electron');
+const { app, BrowserWindow, Tray, Menu, globalShortcut, nativeImage, session, webContents } = require('electron');
 const path = require('path');
 
 // Prevent background throttling globally — this is the key fix
@@ -136,9 +136,26 @@ function createTray() {
 const { ipcMain } = require('electron');
 ipcMain.on('pin-changed', (e, pinned) => { if (win) win.isPinned = pinned; });
 
+// Google rejects sign-in from embedded browsers, so the player session must look like desktop Chrome
+const CHROME_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+const CHROME_BRANDS = '"Chromium";v="120", "Google Chrome";v="120", "Not?A_Brand";v="8"';
+
+function disguisePlayerSession() {
+  const ytray = session.fromPartition('persist:ytray');
+  ytray.setUserAgent(CHROME_UA);
+  ytray.webRequest.onBeforeSendHeaders((details, callback) => {
+    const headers = details.requestHeaders;
+    headers['sec-ch-ua'] = CHROME_BRANDS;
+    headers['sec-ch-ua-platform'] = '"Windows"';
+    callback({ requestHeaders: headers });
+  });
+}
+
 app.whenReady().then(() => {
   app.setAppUserModelId('com.ytray.app');
   if (process.platform === 'darwin') app.dock.hide();
+
+  disguisePlayerSession();
 
   createWindow();
   createTray();

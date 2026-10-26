@@ -1,6 +1,6 @@
 {
   "name": "ytray",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Lightweight YouTube tray player",
   "main": "main.js",
   "scripts": {

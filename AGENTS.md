@@ -32,7 +32,7 @@ YTray/
 
 - Version is stored in `package.json` → `"version"`
 - Increment the **minor** version (`1.x.0`) for every meaningful change
-- Current version at last edit: **1.3.0**
+- Current version at last edit: **1.4.0**
 - After editing any source file, re-embed into `deploy_YTray.py` (see below)
 
 ## How to make changes
